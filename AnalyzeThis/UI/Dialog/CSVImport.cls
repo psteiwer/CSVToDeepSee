@@ -324,7 +324,11 @@ ClientMethod updateState() [ Language = javascript ]
 /// Kicks off GenerateAll and starts the update timer
 ClientMethod updateProgress() [ Language = javascript]
 {
-	this.trackingId=this.GenerateAll(this.SourceType,this.Source,this.LineSize,this.hasHeaders,this.CubeName,this.propertyJSONStreamID,this.dataJSONStreamID);
+	var file=this.Source
+	if (this.INPUTTYPE=='LOCAL') {
+		file=this.LOCALFILENAME
+	}
+	this.trackingId=this.GenerateAll(this.SourceType,file,this.LineSize,this.hasHeaders,this.CubeName,this.propertyJSONStreamID,this.dataJSONStreamID);
 	if (this.trackingId!='') {
 		zen('timer').timeout=500;
 		zen('timer').startTimer();
@@ -1286,59 +1290,42 @@ ClassMethod CSVToJSON(pFileName As %String = "C:\Users\psteiwer\Documents\simple
 	Set pos=0
 	
 	Try {
-		If (pHasHeaders) {
-			If ##class(AnalyzeThis.Utils).GetNextRegex(.m,.line) {
-				Set m2.Text=line
-				Set propcount=-1
-				While ##class(AnalyzeThis.Utils).GetNextRegex(.m2,.prop,0) {
-					Set propcount=$i(propcount)
+		If ##class(AnalyzeThis.Utils).GetNextRegex(.m,.line) {
+			Set m2.Text=line
+			Set propcount=-1
+			While ##class(AnalyzeThis.Utils).GetNextRegex(.m2,.prop,0) {
+				Set propcount=$i(propcount)
+				If pHasHeaders {
 					Set prop=$zstrip($zstrip(prop,">",","),">C")
 					Set:$e(prop,1)="""" prop=$e(prop,2,*)
 					Set:$e(prop,*)="""" prop=$e(prop,1,*-1)
 					Set prop=$zstrip(prop,"*P")
-					Do displayarray.%Push(prop)
-					Do typearray.%Push("%String")
-					Do dateformatarray.%Push("")
-					Do intformatarray.%Push("")
-					Do includearray.%Push("true")
-					Do ignorearray.%Push(prop="")
-					Do propposition.%Set(prop,propcount)
+				} Else {
+					Set prop="Property"_propcount
 				}
-				Do properties.%Set("Properties",propposition)
-				Do properties.%Set("Display",displayarray)
-				Do properties.%Set("Type",typearray)
-				Do properties.%Set("DateFormat",dateformatarray)
-				Do properties.%Set("IntFormat",intformatarray)
-				Do properties.%Set("Include",includearray)
-				Do properties.%Set("Ignore",ignorearray)
+				Do displayarray.%Push(prop)
+				Do typearray.%Push("%String")
+				Do dateformatarray.%Push("")
+				Do intformatarray.%Push("")
+				Do includearray.%Push("true")
+				Do ignorearray.%Push(prop="")
+				Do propposition.%Set(prop,propcount)
+			}
+			Do properties.%Set("Properties",propposition)
+			Do properties.%Set("Display",displayarray)
+			Do properties.%Set("Type",typearray)
+			Do properties.%Set("DateFormat",dateformatarray)
+			Do properties.%Set("IntFormat",intformatarray)
+			Do properties.%Set("Include",includearray)
+			Do properties.%Set("Ignore",ignorearray)
+			
+			If pHasHeaders {
 				Set pos=m.End-1
 			} Else {
-				// Headers too long, pick different file
+				Do m.ResetPosition()
 			}
 		} Else {
-			If ##class(AnalyzeThis.Utils).GetNextRegex(.m,.line) {
-				Set m2.Text=line
-				Set propcount=-1
-				While ##class(AnalyzeThis.Utils).GetNextRegex(.m2,.prop,0) {
-					Set prop="Property"_$i(propcount)
-					Do displayarray.%Push(prop)
-					Do typearray.%Push("%String")
-					Do dateformatarray.%Push("")
-					Do intformatarray.%Push("")
-					Do includearray.%Push("true")
-					Do propposition.%Set(prop,propcount)
-				}
-				Do properties.%Set("Properties",propposition)
-				Do properties.%Set("Display",displayarray)
-				Do properties.%Set("Type",typearray)
-				Do properties.%Set("DateFormat",dateformatarray)
-				Do properties.%Set("IntFormat",intformatarray)
-				Do properties.%Set("Include",includearray)
-				
-				Do m.ResetPosition()
-			} Else {
-				// Headers too long, pick different file
-			}
+			// Headers too long, pick different file
 		}
 		
 		Set totalprops=propcount

@@ -1,7 +1,39 @@
 Class AnalyzeThis.Installer
 {
 
-ClassMethod RunInstaller(pRootDir)
+XData FullInstall [XMLNamespace = INSTALLER ]
+{
+<Manifest>
+	<Default Name="NAMESPACE" Value="AnalyzeThis"/>
+	<Default Name="DBNAME" Value="AnalyzeThis"/>
+	<Default Name="RESOURCE" Value="%DB_${DBNAME}" />
+	
+	<Namespace Name="${NAMESPACE}" Code="${DBNAME}-CODE" Data="${DBNAME}-DATA" Create="yes" Ensemble="0">
+		<Configuration>
+			<Database Name="${DBNAME}-CODE" Dir="${APPPATH}${DBNAME}-CODE" Create="yes" Resource="${RESOURCE}"/>
+			<Database Name="${DBNAME}-DATA" Dir="${APPPATH}${DBNAME}-DATA" Create="yes" Resource="${RESOURCE}"/>
+		</Configuration>
+		<Import File="${APPPATH}/AnalyzeThis/Installer.cls"/>
+		<Invoke Class="AnalyzeThis.Installer" Method="RunInstaller" CheckStatus="1">
+			<Arg Value="${APPPATH}"/>
+		</Invoke>
+	</Namespace>
+</Manifest>
+}
+
+ClassMethod setup(ByRef pVars, pLogLevel As %Integer = 3, pInstaller As %Installer.Installer, pLogger As %Installer.AbstractLogger) As %Status [ CodeMode = objectgenerator, Internal ]
+{
+	#; Let XGL document generate code for this method.
+	Quit ##class(%Installer.Manifest).%Generate(%compiledclass, %code, "FullInstall")
+}
+
+ClassMethod RunFullInstaller(pRootDir) As %Status
+{
+	Set tVars("APPPATH")=pRootDir
+	Quit ..setup(.tVars,3)
+}
+
+ClassMethod RunInstaller(pRootDir) As %Status
 {
 	Set tSC=$$$OK
 	
