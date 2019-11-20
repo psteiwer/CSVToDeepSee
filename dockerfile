@@ -1,6 +1,4 @@
-FROM store/intersystems/iris:2019.2.0.107.0-community
-
-WORKDIR /opt/app
+FROM store/intersystems/iris-community:2019.3.0.309.0
 
 COPY ./ ./
 
@@ -12,9 +10,9 @@ RUN iris start $ISC_PACKAGE_INSTANCENAME quietly EmergencyId=sys,sys && \
             " Do ##class(Security.System).Get(,.p)\n" \
             " Set p(\"AutheEnabled\")=\$zb(p(\"AutheEnabled\"),16,7)\n" \
             " Do ##class(Security.System).Modify(,.p)\n" \
-            " Do \$system.OBJ.Load(\"/opt/app/AnalyzeThis/Installer.cls\",\"ck\")\n" \
-            " Set sc = ##class(AnalyzeThis.Installer).RunFullInstaller(\"/opt/app/\")\n" \
-            " If 'sc do \$zu(4, \$JOB, 1)\n" \
+            " Do \$system.OBJ.Load(\"/home/irisowner/AnalyzeThis/Installer.cls\",\"ck\")\n" \
+			" Set sc = ##class(AnalyzeThis.Installer).RunFullInstaller(\"/home/irisowner/\")\n" \
+			" If 'sc do \$zu(4, \$JOB, 1)\n" \
             " zn \"%sys\"" \
             " write \"Create web application ...\",!" \
             " set webName = \"/csp/AnalyzeThis\"" \
