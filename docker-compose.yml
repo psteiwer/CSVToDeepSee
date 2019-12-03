@@ -5,6 +5,7 @@ services:
     restart: always
     ports:
       - 52883:52773
+      - 51883:51773
     volumes:
       - ~/iris.key:/usr/irissys/mgr/iris.key
       - ./:/iris/app 
