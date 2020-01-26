@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+  <Document name="analyzethis.ZPM">
+    <Module>
+      <Name>analyzethis</Name>
+      <Version>1.1.4</Version>
+      <Packaging>module</Packaging>
+      <Resource Name="AnalyzeThis.PKG"/>
+      <UnitTest Name="/UnitTests" Package="UnitTests" Phase="test"/>
+      <Invokes>
+       <Invoke Class="AnalyzeThis.Installer" Method="RunInstaller">
+        </Invoke>
+      </Invokes>
+    </Module>
+    
+  </Document>
+</Export>

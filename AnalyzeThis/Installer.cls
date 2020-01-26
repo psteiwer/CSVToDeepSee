@@ -4,8 +4,18 @@ Class AnalyzeThis.Installer
 ClassMethod RunInstaller(pRootDir)
 {
 	Set tSC=$$$OK
+
+	set namespace = $ZNspace
+	set app = $System.CSP.GetDefaultApp(namespace) _ "/"
+
+	try {
+		do EnableDeepSee^%SYS.cspServer(app)
+	} catch (ex) {
+		set tSC=ex.AsStatus()
+		write !,"WARNING: failed to enable DeepSee for "_namespace_" namespace."
+	}
 	
-	If pRootDir'="" {
+	If $g(pRootDir)'="" {
 		Do $system.OBJ.LoadDir(pRootDir_"/AnalyzeThis","ck",,1)
 		Set tSC=..ImportImage(pRootDir_"/Assets/AnalyzeThis_BookCover.png")
 		If $$$ISERR(tSC) Quit
